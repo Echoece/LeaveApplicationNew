@@ -1,6 +1,5 @@
 package com.example.leaveapplicationnew.auth;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -48,7 +47,10 @@ public class ApplicationUser {
 
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(
+            cascade = CascadeType.ALL,
+            fetch = FetchType.EAGER
+    )
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(
@@ -62,6 +64,12 @@ public class ApplicationUser {
     )
     private Set<ApplicationUserRole> roles = new HashSet<>();
 
-    // TODO: add managerId as Self reference foreign key
+    // self referencing foreign key
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(
+            name = "manager_id",
+            referencedColumnName = "id"
+    )
+    private ApplicationUser managerId;
 
 }

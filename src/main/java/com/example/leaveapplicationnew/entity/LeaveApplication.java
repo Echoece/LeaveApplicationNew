@@ -1,6 +1,7 @@
 package com.example.leaveapplicationnew.entity;
 
 
+import com.example.leaveapplicationnew.auth.ApplicationUser;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -39,10 +40,23 @@ public class LeaveApplication {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(
+            name = "leave_type_id",
+            referencedColumnName = "id"
+    )
+    private LeaveType leaveType;
+
     private String remark;
     private String managerRemark;
 
 
     // TODO: user_id foreign key
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(
+            name = "user_id",
+            referencedColumnName = "id"
+    )
+    private ApplicationUser user;
 
 }
