@@ -1,13 +1,14 @@
 package com.example.leaveapplicationnew.entity;
 
 
+import com.example.leaveapplicationnew.entity.converter.YearConverter;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.Year;
 
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString @Builder
 
 @Entity
 @Table(name = "yearly_leave")
@@ -24,10 +25,13 @@ public class YearlyLeave {
     )
     @Column(name = "id")
     private Long yearlyLeaveId;
+
+    @Convert( converter = YearConverter.class )
     private Year year;
+
     private int maximumDay;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
             name = "leave_type_id",
             referencedColumnName = "id"

@@ -5,7 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @ToString @Builder
 @Entity
 @Table(name = "leave_type")
 public class LeaveType {

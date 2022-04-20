@@ -13,6 +13,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
 @Entity
 @Table(name = "leave_application")
 public class LeaveApplication {
@@ -40,7 +41,7 @@ public class LeaveApplication {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(
             name = "leave_type_id",
             referencedColumnName = "id"
@@ -51,7 +52,6 @@ public class LeaveApplication {
     private String managerRemark;
 
 
-    // TODO: user_id foreign key
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
             name = "user_id",

@@ -17,6 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @ToString
 @Entity
+@Builder
 @Table(name = "user")
 public class ApplicationUser {
     @Id
@@ -33,6 +34,7 @@ public class ApplicationUser {
     private Long userId;
 
     @Email @NotBlank @Size(max = 50)
+    @Column(unique = true)
     private String email;
 
     @NotBlank @Size(max = 120)
@@ -48,7 +50,6 @@ public class ApplicationUser {
     private String name;
 
     @ManyToMany(
-            cascade = CascadeType.ALL,
             fetch = FetchType.EAGER
     )
     @JoinTable(
@@ -65,7 +66,7 @@ public class ApplicationUser {
     private Set<ApplicationUserRole> roles = new HashSet<>();
 
     // self referencing foreign key
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(
             name = "manager_id",
             referencedColumnName = "id"
