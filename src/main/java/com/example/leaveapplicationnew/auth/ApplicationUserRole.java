@@ -4,8 +4,6 @@ package com.example.leaveapplicationnew.auth;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -31,7 +29,8 @@ public class ApplicationUserRole {
     private String label;
     private String name;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    /*@ManyToMany
+    @JsonBackReference
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(
@@ -43,5 +42,5 @@ public class ApplicationUserRole {
                     referencedColumnName = "id"
             )
     )
-    private Set<ApplicationUser> users = new HashSet<>();
+    private Set<ApplicationUser> users = new HashSet<>();*/
 }

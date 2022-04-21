@@ -1,6 +1,8 @@
 package com.example.leaveapplicationnew.auth;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,7 +17,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
+@ToString(exclude = "roles")
 @Entity
 @Builder
 @Table(name = "user")
@@ -38,6 +40,7 @@ public class ApplicationUser {
     private String email;
 
     @NotBlank @Size(max = 120)
+    @JsonIgnore
     private String password;
 
     @Column(name = "accessToken")
@@ -49,9 +52,8 @@ public class ApplicationUser {
 
     private String name;
 
-    @ManyToMany(
-            fetch = FetchType.EAGER
-    )
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JsonManagedReference   // for fixing the recursive call on jackson issue
     @JoinTable(
             name = "user_role",
             joinColumns = @JoinColumn(

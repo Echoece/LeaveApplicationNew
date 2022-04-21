@@ -41,7 +41,7 @@ public class LeaveApplication {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(
             name = "leave_type_id",
             referencedColumnName = "id"
@@ -52,7 +52,7 @@ public class LeaveApplication {
     private String managerRemark;
 
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(
             name = "user_id",
             referencedColumnName = "id"
