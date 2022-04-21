@@ -12,7 +12,7 @@ public class ApplicationUserDTO {
     private String password;
     private String accessToken;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING , pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING , pattern = "yyyy-MM-dd")
     private Date tokenExpireTime;
 
     private long managerId;

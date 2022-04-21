@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data @Builder
 public class TotalLeaveDTO {
-    private String status;
     private long leaveTypeId;
     private int maxAllowedLeave;
     private String leaveTypeName;

@@ -12,7 +12,6 @@ public class TotalLeaveRowMapper implements RowMapper<TotalLeaveDTO> {
     @Override
     public TotalLeaveDTO mapRow(ResultSet rs, int rowNum) throws SQLException {
         TotalLeaveDTO leaveApplicationDTO = TotalLeaveDTO.builder()
-                .status(rs.getString("status"))
                 .leaveTypeId(rs.getLong("leave_type_id"))
                 .leaveTypeName(rs.getString("leave_type_name"))
                 .userId(rs.getLong("user_id"))

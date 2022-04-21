@@ -63,4 +63,10 @@ class ApplicationUserRepositoryTest {
         user.setPassword("1234");
         userRepository.save(user);
     }
+
+    @Test
+    public void getUser(){
+        long userId = 4;
+        System.out.println(userRepository.findById(userId));
+    }
 }

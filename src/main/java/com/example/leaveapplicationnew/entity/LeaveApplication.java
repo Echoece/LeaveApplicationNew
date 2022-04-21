@@ -30,11 +30,11 @@ public class LeaveApplication {
     @Column(name = "id")
     private Long leaveApplicationId;
 
-    @JsonFormat(pattern = "dd-MM-yyyy" , shape = JsonFormat.Shape.STRING)
+    @JsonFormat(pattern = "yyyy-MM-dd" , shape = JsonFormat.Shape.STRING)
     @Column(name = "from_date")
     private Date fromDate;
 
-    @JsonFormat(pattern = "dd-MM-yyyy" , shape = JsonFormat.Shape.STRING)
+    @JsonFormat(pattern = "yyyy-MM-dd", shape = JsonFormat.Shape.STRING)
     @Column(name = "to_date")
     private Date toDate;
 

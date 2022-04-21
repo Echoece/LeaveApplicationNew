@@ -36,6 +36,7 @@ public class ManagerService {
                 + " WHERE user_id IN (SELECT id FROM user WHERE manager_id = :managerID) AND status = 'PENDING'";
 
         SqlParameterSource parameterSource = new MapSqlParameterSource().addValue("managerID",managerId);
+
         return jdbcTemplate.query(
                 query ,
                 parameterSource,

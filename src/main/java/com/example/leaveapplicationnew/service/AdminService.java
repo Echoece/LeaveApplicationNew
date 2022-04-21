@@ -61,9 +61,7 @@ public class AdminService {
         ApplicationUserRole role = roleRepository.findFirstByName(userDTO.getRole());
 
         // get the manager
-        ApplicationUser manager = userRepository
-                .findById(userDTO.getManagerId())
-                .orElseThrow(RuntimeException::new);
+        ApplicationUser manager = userRepository.findById(userDTO.getManagerId()).get();
 
         // build the user
         ApplicationUser user = ApplicationUser.builder()

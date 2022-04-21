@@ -3,6 +3,7 @@ package com.example.leaveapplicationnew.controller;
 import com.example.leaveapplicationnew.entity.LeaveApplication;
 import com.example.leaveapplicationnew.entity.Status;
 import com.example.leaveapplicationnew.entity.dto.LeaveApplicationDTO;
+import com.example.leaveapplicationnew.entity.dto.ManagerRemarkDTO;
 import com.example.leaveapplicationnew.entity.dto.TotalLeaveDTO;
 import com.example.leaveapplicationnew.service.ManagerService;
 import lombok.AllArgsConstructor;
@@ -17,21 +18,25 @@ import java.util.List;
 public class ManagerController {
     private final ManagerService managerService;
 
+    // tested + need to fix the manager id from spring security
     @GetMapping("/all")
     public List<LeaveApplicationDTO> showPendingApplication(){
         return managerService.showPendingApplication();
     }
 
+    // tested + done
     @PostMapping("/approve/{id}")
     public LeaveApplication approveApplication(@PathVariable("id") long id){
         return managerService.approveOrRejectApplication(id, Status.APPROVED);
     }
 
+    // tested + done
     @PostMapping("/reject/{id}")
     public LeaveApplication rejectApplication(@PathVariable("id") long id){
         return managerService.approveOrRejectApplication(id, Status.REJECTED);
     }
 
+    // not fully tested
     @GetMapping("/leaveBalance")
     public List<TotalLeaveDTO> showLeaveBalance(){
         int searchYear = Year.now().getValue();
@@ -40,9 +45,10 @@ public class ManagerController {
         return managerService.showLeaveBalance(managerId, searchYear);
     }
 
+    // tested + done
     @PostMapping("/addRemark/{id}")
-    public LeaveApplication addRemark(@PathVariable("id") long id, @RequestBody String managerRemark){
-        return managerService.putManagerRemark(id, managerRemark);
+    public LeaveApplication addRemark(@PathVariable("id") long applicationId, @RequestBody ManagerRemarkDTO managerRemark){
+        return managerService.putManagerRemark(applicationId, managerRemark.getValue());
     }
 
 

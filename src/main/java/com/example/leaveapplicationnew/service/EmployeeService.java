@@ -16,7 +16,6 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.time.Year;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -92,7 +91,7 @@ public class EmployeeService {
         String status = Status.APPROVED.name();
         // SQL query to find status, leave Type id + name , user id + name, maximum allowed leave for the year, total leave taken by employee that year.
 
-        String SQL = "SELECT     l.status,  l.leave_type_id, yl.maximum_day AS max_allowed_leave, "
+        String SQL = "SELECT    l.leave_type_id, yl.maximum_day AS max_allowed_leave, "
                             + " lt.name AS leave_type_name, u.id AS user_id, u.name AS user_name, "
                 + " SUM(DATEDIFF(l.to_date,l.from_date)) AS total_leave "
                 + " FROM leave_application_new.leave_application l "
@@ -131,7 +130,8 @@ public class EmployeeService {
         // find the total leave balance for the user
         List<TotalLeaveDTO> totalLeaveDTOS = showLeaveBalanceForEmployee(
                 application.getUser().getUserId(),
-                Year.now().getValue()
+                //Year.now().getValue()
+                2020
         );
 
         // find the available leave balance from the totalLeaveDTO

@@ -25,16 +25,19 @@ public class AdminController {
         return adminService.viewAllLeave();
     }
 
+    // done + tested
     @PostMapping("/addUser")
     public ApplicationUser addUser(@RequestBody ApplicationUserDTO userDTO){
         return adminService.addUser(userDTO);
     }
 
+    // done + tested
     @PostMapping("/addYearlyLeave")
     public YearlyLeave allocateYearlyLeave(@RequestBody YearlyLeaveDTO yearlyLeaveDTO){
         return adminService.allocateYearlyLeave(yearlyLeaveDTO);
     }
 
+    // done + tested
     @PostMapping("/addLeaveType")
     public LeaveType createLeaveType(@RequestBody LeaveTypeDTO leavetypeDTO){
         return adminService.createLeaveType(leavetypeDTO);
