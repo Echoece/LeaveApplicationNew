@@ -20,34 +20,35 @@ import java.util.List;
 public class AdminController {
     private final AdminService adminService;
 
-    // tested + done
+    // done
     @GetMapping("/all")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<LeaveApplicationDTO> viewAllLeave(){
         return adminService.viewAllLeave();
     }
 
-    // done + tested
+    // done
     @PostMapping("/addUser")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ApplicationUser addUser(@RequestBody ApplicationUserDTO userDTO){
         return adminService.addUser(userDTO);
     }
 
-    // done + tested
+    // done
     @PostMapping("/addYearlyLeave")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public YearlyLeave allocateYearlyLeave(@RequestBody YearlyLeaveDTO yearlyLeaveDTO){
         return adminService.allocateYearlyLeave(yearlyLeaveDTO);
     }
 
-    // done + tested
+    // done
     @PostMapping("/addLeaveType")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public LeaveType createLeaveType(@RequestBody LeaveTypeDTO leavetypeDTO){
         return adminService.createLeaveType(leavetypeDTO);
     }
 
+    // done
     @PostMapping("/setManager/{mId}/{eId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void setManagerToEmployee(@PathVariable("eId") long employeeId, @PathVariable("mId") long managerId){

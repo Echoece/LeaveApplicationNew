@@ -12,6 +12,7 @@ import com.example.leaveapplicationnew.entity.rowmapper.TotalLeaveRowMapper;
 import com.example.leaveapplicationnew.repo.ApplicationUserRepository;
 import com.example.leaveapplicationnew.repo.LeaveApplicationRepository;
 import com.example.leaveapplicationnew.repo.LeaveTypeRepository;
+import com.example.leaveapplicationnew.repo.YearlyLeaveRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -29,6 +30,7 @@ public class EmployeeService {
     private final LeaveApplicationRepository leaveApplicationRepository;
     private final LeaveTypeRepository leaveTypeRepository;
     private final ApplicationUserRepository userRepository;
+    private final YearlyLeaveRepository yearlyLeaveRepository;
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -36,7 +38,7 @@ public class EmployeeService {
     private final TotalLeaveRowMapper totalLeaveRowMapper;
 
 
-    public LeaveApplication createApplication(LeaveApplicationDTO applicationDTO){
+    public LeaveApplicationDTO createApplication(LeaveApplicationDTO applicationDTO){
         if(applicationDTO==null){
             return null;
         }
@@ -56,29 +58,68 @@ public class EmployeeService {
                 .user(user)
                 .build();
 
-        return leaveApplicationRepository.save(application);
+        application = leaveApplicationRepository.save(application);
+
+        return LeaveApplicationDTO.builder()
+                .id(application.getLeaveApplicationId())
+                .remark(application.getRemark())
+                .fromDate(application.getFromDate())
+                .toDate(application.getToDate())
+                .leaveTypeID(application.getLeaveType().getLeaveTypeId())
+                .leaveTypeName(application.getLeaveType().getName())
+                .userId(application.getUser().getUserId())
+                .userName(application.getUser().getName())
+                .build();
     }
 
 
-    public LeaveApplication editApplication(LeaveApplicationDTO applicationDTO){
+    public LeaveApplicationDTO editApplication(LeaveApplicationDTO applicationDTO){
         if(applicationDTO==null){
             return null;
         }
-        LeaveType leaveType = leaveTypeRepository.findById(applicationDTO.getLeaveTypeID())
-                        .orElseThrow(RuntimeException::new);
-
+        // find the application
         LeaveApplication application = leaveApplicationRepository.findById(applicationDTO.getId())
                 .orElseThrow(RuntimeException::new);
 
+        // can only edit if the application is not submitted, pending or rejected
+        if(application.getStatus()!=null) return null;
+
+        // find the leave type
+        LeaveType leaveType = leaveTypeRepository.findById(applicationDTO.getLeaveTypeID())
+                .orElseThrow(RuntimeException::new);
+
+        // find the logged in user
         ApplicationUser user = getApplicationUser();
 
+        // can not edit other employee application
+        if(!user.getUserId().equals(application.getUser().getUserId()))
+            return null;
+
+        // update changes
         application.setRemark(applicationDTO.getRemark());
         application.setFromDate(applicationDTO.getFromDate());
         application.setToDate(applicationDTO.getToDate());
         application.setLeaveType(leaveType);
         application.setUser(user);
 
-        return leaveApplicationRepository.save(application);
+        application = leaveApplicationRepository.save(application);
+
+        // build the DTO and return
+        String status = null;
+        if(application.getStatus()!=null) status = application.getStatus().name();
+
+        return LeaveApplicationDTO.builder()
+                .id(application.getLeaveApplicationId())
+                .remark(application.getRemark())
+                .managerRemark(application.getManagerRemark())
+                .fromDate(application.getFromDate())
+                .toDate(application.getToDate())
+                .leaveTypeID(application.getLeaveType().getLeaveTypeId())
+                .leaveTypeName(application.getLeaveType().getName())
+                .userId(application.getUser().getUserId())
+                .userName(application.getUser().getName())
+                .status(status)
+                .build();
     }
 
     // done, all application for a user id
@@ -148,19 +189,18 @@ public class EmployeeService {
         // find the available leave balance
         long leaveTypeId = application.getLeaveType().getLeaveTypeId();
 
-        int maxAllowedLeave= totalLeaveDTOS.stream()
+        int year  = Year.from(application.getToDate().toLocalDate()).getValue();
+        int maxAllowedLeave= yearlyLeaveRepository.findMaximumDayByYearAndLeaveTypeId(year, leaveTypeId);
+
+        TotalLeaveDTO filteredDTO = totalLeaveDTOS.stream()
                 .filter(element -> element.getLeaveTypeId() == leaveTypeId)
                 .findFirst()
-                .orElseThrow(RuntimeException::new)
-                .getMaxAllowedLeave();
+                .orElse(null);
 
-        int totalTakenLeave = totalLeaveDTOS.stream()
-                .filter(element -> element.getLeaveTypeId() == leaveTypeId)
-                .findFirst()
-                .orElseThrow(RuntimeException::new)
-                .getTotalLeave();
+        // if the leave type is not in the DTO, employee didnt take any vacation
+        if(filteredDTO==null) return true;
 
-        int availableLeaveBalance = maxAllowedLeave - totalTakenLeave;
+        int availableLeaveBalance = maxAllowedLeave - filteredDTO.getTotalLeave();
 
         // find number of applied days in the current application
         Date fromDate = application.getFromDate();

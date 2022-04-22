@@ -1,6 +1,5 @@
 package com.example.leaveapplicationnew.controller;
 
-import com.example.leaveapplicationnew.entity.LeaveApplication;
 import com.example.leaveapplicationnew.entity.dto.LeaveApplicationDTO;
 import com.example.leaveapplicationnew.entity.dto.TotalLeaveDTO;
 import com.example.leaveapplicationnew.service.EmployeeService;
@@ -16,24 +15,24 @@ import java.util.List;
 public class EmployeeController {
     private final EmployeeService employeeService;
 
-    // tested + done,
+    // done,
     @PostMapping("/addApplication")
     @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
-    public LeaveApplication createLeaveApplication(@RequestBody LeaveApplicationDTO applicationDTO){
+    public LeaveApplicationDTO createLeaveApplication(@RequestBody LeaveApplicationDTO applicationDTO){
         return employeeService.createApplication(applicationDTO);
     }
 
-    // done + tested
+    // done
     @GetMapping("/viewApplication")
     @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public List<LeaveApplicationDTO> viewAllApplication(){
         return employeeService.viewAllApplicationForUser();
     }
 
-    // tested + done
+    // done
     @PutMapping("/editApplication")
     @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
-    public LeaveApplication editApplication(@RequestBody LeaveApplicationDTO leaveApplicationDTO){
+    public LeaveApplicationDTO editApplication(@RequestBody LeaveApplicationDTO leaveApplicationDTO){
         return employeeService.editApplication(leaveApplicationDTO);
     }
 

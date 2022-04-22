@@ -85,7 +85,7 @@ public class AdminService {
                 + " FROM leave_application_new.leave_application l "
                 + " JOIN leave_application_new.user u ON l.user_id = u.id "
                 + " JOIN leave_application_new.leave_type lt ON l.leave_type_id = lt.id "
-                + " WHERE status IS NOT NULL";
+                + " WHERE status = 'APPROVED'";
 
         return jdbcTemplate.query(SQL, leaveApplicationRowMapper);
     }
