@@ -56,6 +56,7 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
 
             // extracting username and authorities
             String username = body.getSubject();
+
             List<Map<String, String>> authorities = (List<Map<String, String>>) body.get(JwtConfig.AUTHORITIES);
 
             // As our UsernamePasswordAuthenticationToken expects a collection<? extends GrantedAuthority>, we map the authorities as Set
@@ -73,8 +74,9 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
 
         }catch (JwtException ex) {
             //this is very important, since it guarantees the user is not authenticated at all
-            SecurityContextHolder.clearContext();
+            //SecurityContextHolder.clearContext();
             throw new IllegalStateException(String.format("Token %s cant be trusted", token ));
         }
+        filterChain.doFilter(request, response);
     }
 }

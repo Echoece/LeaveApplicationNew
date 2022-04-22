@@ -20,7 +20,7 @@ public class MyUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        return userRepository.getApplicationUserByEmail(username)
+        return userRepository.getApplicationUserByName(username)
                 .map(this::createUser)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("User name %s not found",username)));
 

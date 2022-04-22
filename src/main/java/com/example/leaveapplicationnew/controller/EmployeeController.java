@@ -5,6 +5,7 @@ import com.example.leaveapplicationnew.entity.dto.LeaveApplicationDTO;
 import com.example.leaveapplicationnew.entity.dto.TotalLeaveDTO;
 import com.example.leaveapplicationnew.service.EmployeeService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,44 +16,40 @@ import java.util.List;
 public class EmployeeController {
     private final EmployeeService employeeService;
 
-    // tested + done, todo- need to add user id from context
+    // tested + done,
     @PostMapping("/addApplication")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public LeaveApplication createLeaveApplication(@RequestBody LeaveApplicationDTO applicationDTO){
         return employeeService.createApplication(applicationDTO);
     }
 
     // done + tested
-    // TODO: get the id from security context
     @GetMapping("/viewApplication")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public List<LeaveApplicationDTO> viewAllApplication(){
-        long userId = 4;
-        return employeeService.viewAllApplicationForUser(userId);
+        return employeeService.viewAllApplicationForUser();
     }
 
-    // TODO: get the id from security context
-    // tested + done otherwise
+    // tested + done
     @PutMapping("/editApplication")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public LeaveApplication editApplication(@RequestBody LeaveApplicationDTO leaveApplicationDTO){
         return employeeService.editApplication(leaveApplicationDTO);
     }
 
-
-
-    // utility method year is hardcoded atm, need fix
+    // done + tested
     @GetMapping("/submitApplication/{id}")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public void submitApplication(@PathVariable("id") long id){
         employeeService.sendApplicationForApproval(id);
     }
 
 
-    // done + tested // current year is hardcoded atm
+    // done + tested
     @GetMapping("/leaveBalance")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
     public List<TotalLeaveDTO>  showLeaveBalance(){
-        //int searchYear = Year.now().getValue();
-        int searchYear = 2020;
-        long userId = 4;  // TODO: get from security context
-
-        return employeeService.showLeaveBalanceForEmployee(userId, searchYear);
+        return employeeService.showLeaveBalanceForEmployee();
     }
 
 

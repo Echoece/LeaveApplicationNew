@@ -89,4 +89,13 @@ public class AdminService {
 
         return jdbcTemplate.query(SQL, leaveApplicationRowMapper);
     }
+
+    public void setManagerToEmployee(long employeeId, long managerId) {
+        ApplicationUser employee = userRepository.findById(employeeId).orElseThrow(RuntimeException::new);
+        ApplicationUser manager = userRepository.findById(managerId).orElseThrow(RuntimeException::new);
+
+        employee.setManagerId(manager);
+
+        userRepository.save(employee);
+    }
 }

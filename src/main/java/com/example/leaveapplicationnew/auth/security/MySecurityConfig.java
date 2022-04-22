@@ -39,7 +39,6 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .cors().disable()
                 .csrf().disable()
                 .sessionManagement()                           // making session stateless, No session will be created or used by spring security
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

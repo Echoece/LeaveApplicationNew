@@ -1,5 +1,7 @@
 package com.example.leaveapplicationnew.service;
 
+import com.example.leaveapplicationnew.auth.security.SecurityUtils;
+import com.example.leaveapplicationnew.entity.ApplicationUser;
 import com.example.leaveapplicationnew.entity.LeaveApplication;
 import com.example.leaveapplicationnew.entity.Status;
 import com.example.leaveapplicationnew.entity.dto.LeaveApplicationDTO;
@@ -13,6 +15,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 
+import java.time.Year;
 import java.util.List;
 
 @Service
@@ -26,8 +29,8 @@ public class ManagerService {
 
 
     public List<LeaveApplicationDTO> showPendingApplication(){
-        // find user id if this manager
-        int managerId = 4; // TODO: change this to get the user from security context
+        // find user id of this manager
+        long managerId = getApplicationUser().getUserId();
 
         String query = "SELECT l.*, lt.name AS leave_type_name, u.name as user_name  "
                 + " FROM leave_application l"
@@ -62,7 +65,10 @@ public class ManagerService {
         return leaveApplicationRepository.save(application);
     }
 
-    public List<TotalLeaveDTO> showLeaveBalance(int managerId, int searchYear){
+    public List<TotalLeaveDTO> showLeaveBalance( ){
+        long managerId = getApplicationUser().getUserId();
+        int searchYear = Year.now().getValue();
+
         String status = Status.APPROVED.name();
 
         // SQL query to find status, leave Type id + name , user id + name,
@@ -95,5 +101,17 @@ public class ManagerService {
         application.setManagerRemark(remark);
 
         return leaveApplicationRepository.save(application);
+    }
+
+    // utility method to get current logged in user
+    private ApplicationUser getApplicationUser() {
+        String username = SecurityUtils
+                .getCurrentLoggedInUserName()
+                .orElseThrow(RuntimeException::new);
+
+        ApplicationUser user = userRepository
+                .getApplicationUserByName(username)
+                .orElseThrow(RuntimeException::new);
+        return user;
     }
 }

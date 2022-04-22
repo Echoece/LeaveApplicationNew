@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface ApplicationUserRepository extends JpaRepository<ApplicationUser, Long> {
 
     Optional<ApplicationUser> getApplicationUserByEmail(String email);
+    Optional<ApplicationUser> getApplicationUserByName(String name);
 }
