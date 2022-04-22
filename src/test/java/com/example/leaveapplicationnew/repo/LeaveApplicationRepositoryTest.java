@@ -1,6 +1,6 @@
 package com.example.leaveapplicationnew.repo;
 
-import com.example.leaveapplicationnew.auth.ApplicationUser;
+import com.example.leaveapplicationnew.entity.ApplicationUser;
 import com.example.leaveapplicationnew.entity.LeaveApplication;
 import com.example.leaveapplicationnew.entity.LeaveType;
 import com.example.leaveapplicationnew.entity.Status;

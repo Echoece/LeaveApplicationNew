@@ -1,7 +1,7 @@
 package com.example.leaveapplicationnew.service;
 
-import com.example.leaveapplicationnew.auth.ApplicationUser;
-import com.example.leaveapplicationnew.auth.ApplicationUserRole;
+import com.example.leaveapplicationnew.entity.ApplicationUser;
+import com.example.leaveapplicationnew.entity.ApplicationUserRole;
 import com.example.leaveapplicationnew.entity.LeaveType;
 import com.example.leaveapplicationnew.entity.YearlyLeave;
 import com.example.leaveapplicationnew.entity.dto.ApplicationUserDTO;

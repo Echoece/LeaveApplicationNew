@@ -1,4 +1,4 @@
-package com.example.leaveapplicationnew.auth;
+package com.example.leaveapplicationnew.entity;
 
 
 import lombok.*;

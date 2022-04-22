@@ -1,7 +1,7 @@
 package com.example.leaveapplicationnew.repo;
 
-import com.example.leaveapplicationnew.auth.ApplicationUser;
-import com.example.leaveapplicationnew.auth.ApplicationUserRole;
+import com.example.leaveapplicationnew.entity.ApplicationUser;
+import com.example.leaveapplicationnew.entity.ApplicationUserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

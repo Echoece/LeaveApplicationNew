@@ -1,6 +1,6 @@
 package com.example.leaveapplicationnew.controller;
 
-import com.example.leaveapplicationnew.auth.ApplicationUser;
+import com.example.leaveapplicationnew.entity.ApplicationUser;
 import com.example.leaveapplicationnew.entity.LeaveType;
 import com.example.leaveapplicationnew.entity.YearlyLeave;
 import com.example.leaveapplicationnew.entity.dto.ApplicationUserDTO;

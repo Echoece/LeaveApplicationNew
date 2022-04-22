@@ -1,7 +1,6 @@
 package com.example.leaveapplicationnew.entity;
 
 
-import com.example.leaveapplicationnew.auth.ApplicationUser;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
