@@ -37,7 +37,6 @@ public class EmployeeService {
     private final LeaveApplicationRowMapper leaveApplicationRowMapper;
     private final TotalLeaveRowMapper totalLeaveRowMapper;
 
-
     public LeaveApplicationDTO createApplication(LeaveApplicationDTO applicationDTO){
         if(applicationDTO==null){
             return null;
@@ -72,28 +71,24 @@ public class EmployeeService {
                 .build();
     }
 
-
     public LeaveApplicationDTO editApplication(LeaveApplicationDTO applicationDTO){
         if(applicationDTO==null){
             return null;
         }
-        // find the application
-        LeaveApplication application = leaveApplicationRepository.findById(applicationDTO.getId())
-                .orElseThrow(RuntimeException::new);
 
         // can only edit if the application is not submitted, pending or rejected
+        LeaveApplication application = leaveApplicationRepository.findById(applicationDTO.getId())
+                .orElseThrow(RuntimeException::new);
         if(application.getStatus()!=null) return null;
+
+        // can not edit other employee application
+        ApplicationUser user = getApplicationUser();
+        if(!user.getUserId().equals(application.getUser().getUserId()))
+            return null;
 
         // find the leave type
         LeaveType leaveType = leaveTypeRepository.findById(applicationDTO.getLeaveTypeID())
                 .orElseThrow(RuntimeException::new);
-
-        // find the logged in user
-        ApplicationUser user = getApplicationUser();
-
-        // can not edit other employee application
-        if(!user.getUserId().equals(application.getUser().getUserId()))
-            return null;
 
         // update changes
         application.setRemark(applicationDTO.getRemark());
@@ -139,34 +134,42 @@ public class EmployeeService {
         return jdbcTemplate.query(SQL, sqlParameterSource, leaveApplicationRowMapper);
     }
 
-    // done
+    // TODO: need to work on this to get all the info in single SQL, this solution might have performance issue
     public List<TotalLeaveDTO>  showLeaveBalanceForEmployee(){
         String status = Status.APPROVED.name();
-        // SQL query to find status, leave Type id + name , user id + name, maximum allowed leave for the year, total leave taken by employee that year.
+
+        // SQL query to find status, leave Type id + name , user id + name, maximum allowed leave for the year, total
+        // leave taken by employee that year.
 
         long userId = getApplicationUser().getUserId();
         int searchYear = Year.now().getValue();
 
-        String SQL = "SELECT    l.leave_type_id, yl.maximum_day AS max_allowed_leave, "
-                            + " lt.name AS leave_type_name, u.id AS user_id, u.name AS user_name, "
-                + " SUM(DATEDIFF(l.to_date,l.from_date)) AS total_leave "
-                + " FROM leave_application_new.leave_application l "
-                + " JOIN leave_application_new.user u "
-                            + " ON l.user_id = u.id "
-                + " JOIN leave_application_new.leave_type lt "
-                            + " ON l.leave_type_id = lt.id "
-                + " JOIN yearly_leave yl "
-                            + " ON lt.id = yl.leave_type_id "
-                + " WHERE "
-                            + "l.user_id =:userId AND status = :status AND YEAR(l.from_date) =:searchYear "
-                + " GROUP BY l.leave_type_id";
+        String SQL = "SELECT SUM(DATEDIFF(to_date,from_date)) AS total_leave , leave_type_id, user_id "
+                + "FROM leave_application "
+                + "WHERE YEAR(from_date) = :searchYear AND status = :status AND user_id = :userId GROUP BY leave_type_id";
 
         SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
                 .addValue("searchYear", searchYear)
                 .addValue("status", status)
                 .addValue("userId", userId);
 
-        return jdbcTemplate.query(SQL, sqlParameterSource, totalLeaveRowMapper);
+        List<TotalLeaveDTO> totalLeaveDTO = jdbcTemplate.query(
+                SQL,
+                sqlParameterSource,
+                (rs, rowNum) -> TotalLeaveDTO.builder()
+                        .leaveTypeId(rs.getLong("leave_type_id"))
+                        .userId(rs.getLong("user_id"))
+                        .totalLeave(rs.getInt("total_leave"))
+                        .build()
+        );
+
+        totalLeaveDTO.forEach(element -> {
+            element.setLeaveTypeName(leaveTypeRepository.findById(element.getLeaveTypeId()).get().getName());
+            element.setUserName(userRepository.findById(element.getUserId()).get().getName());
+            element.setMaxAllowedLeave(yearlyLeaveRepository.findMaximumDayByYearAndLeaveTypeId(Year.now().getValue(), element.getLeaveTypeId()));
+        });
+
+        return totalLeaveDTO;
     }
 
     // done

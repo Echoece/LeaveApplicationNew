@@ -9,6 +9,8 @@ import com.example.leaveapplicationnew.entity.dto.TotalLeaveDTO;
 import com.example.leaveapplicationnew.entity.rowmapper.TotalLeaveRowMapper;
 import com.example.leaveapplicationnew.repo.ApplicationUserRepository;
 import com.example.leaveapplicationnew.repo.LeaveApplicationRepository;
+import com.example.leaveapplicationnew.repo.LeaveTypeRepository;
+import com.example.leaveapplicationnew.repo.YearlyLeaveRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -23,6 +25,8 @@ import java.util.List;
 public class ManagerService {
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final TotalLeaveRowMapper totalLeaveRowMapper;
+    private final LeaveTypeRepository leaveTypeRepository;
+    private final YearlyLeaveRepository yearlyLeaveRepository;
 
     private final LeaveApplicationRepository leaveApplicationRepository;
     private final ApplicationUserRepository userRepository;
@@ -73,26 +77,34 @@ public class ManagerService {
 
         // SQL query to find status, leave Type id + name , user id + name,
         // maximum allowed leave for the year, total leave taken by employee that year.
-        String SQL = "SELECT l.status,  l.leave_type_id, yl.maximum_day AS max_allowed_leave, "
-                + " lt.name AS leave_type_name, u.id AS user_id, u.name AS user_name, "
-                + " SUM(DATEDIFF(l.to_date,l.from_date)) AS total_leave "
-                + " FROM leave_application_new.leave_application l "
-                + " JOIN leave_application_new.user u "
-                + " ON l.user_id = u.id "
-                + " JOIN leave_application_new.leave_type lt "
-                + " ON l.leave_type_id = lt.id "
-                + " JOIN yearly_leave yl "
-                + " ON lt.id = yl.leave_type_id "
-                + " WHERE "
-                + " l.user_id IN(SELECT id FROM user WHERE manager_id=:managerId) AND status = :status AND  YEAR(l.from_date) =:searchYear "
-                + " GROUP BY l.leave_type_id";
+
+        String SQL = "SELECT SUM(DATEDIFF(to_date,from_date)) AS total_leave , leave_type_id, user_id "
+                + " FROM leave_application "
+                + " WHERE YEAR(from_date) = :searchYear AND status = :status AND user_id IN(SELECT id FROM user WHERE manager_id=:managerId)  "
+                + " GROUP BY leave_type_id, user_id";
 
         SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
                 .addValue("searchYear", searchYear)
                 .addValue("status", status)
                 .addValue("managerId", managerId);
 
-        return jdbcTemplate.query(SQL, sqlParameterSource, totalLeaveRowMapper);
+        List<TotalLeaveDTO> totalLeaveDTO =  jdbcTemplate.query(
+                SQL,
+                sqlParameterSource,
+                (rs, rowNum) -> TotalLeaveDTO.builder()
+                                .leaveTypeId(rs.getLong("leave_type_id"))
+                                .userId(rs.getLong("user_id"))
+                                .totalLeave(rs.getInt("total_leave"))
+                                .build()
+        );
+
+        totalLeaveDTO.forEach(element -> {
+            element.setLeaveTypeName(leaveTypeRepository.findById(element.getLeaveTypeId()).get().getName());
+            element.setUserName(userRepository.findById(element.getUserId()).get().getName());
+            element.setMaxAllowedLeave(yearlyLeaveRepository.findMaximumDayByYearAndLeaveTypeId(Year.now().getValue(), element.getLeaveTypeId()));
+        });
+
+        return totalLeaveDTO;
     }
 
     public LeaveApplication putManagerRemark(long applicationId, String remark){
