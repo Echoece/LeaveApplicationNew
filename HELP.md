@@ -23,5 +23,4 @@ Admin feature:
   3. Add user
   4. View all leave
 
-Entity-Relationship Diagram:
-![E-R Diagram](https://github.com/Echoece/LeaveApplicationNew/blob/master/E-R%20Diagram.jpg Project E-R Diagram")
+
