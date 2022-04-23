@@ -35,7 +35,9 @@ public class ApplicationUser {
     @Column(name = "id")
     private Long userId;
 
-    @Email @NotBlank @Size(max = 50)
+    @Email
+    @NotBlank(message = "email is mandatory")
+    @Size(max = 50)
     @Column(unique = true)
     private String email;
 

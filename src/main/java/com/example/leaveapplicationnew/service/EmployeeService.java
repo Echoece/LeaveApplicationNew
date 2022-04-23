@@ -144,6 +144,20 @@ public class EmployeeService {
         long userId = getApplicationUser().getUserId();
         int searchYear = Year.now().getValue();
 
+        /*
+         String SQL =  " SELECT l.leave_type_id, yl.maximum_day AS max_allowed_leave,
+                lt.name AS leave_type_name, u.id AS user_id, u.name AS user_name
+                FROM leave_application l
+                JOIN leave_application_new.user u
+                    ON l.user_id = u.id
+                JOIN leave_application_new.leave_type lt
+                    ON l.leave_type_id = lt.id
+                JOIN yearly_leave yl
+                    ON l.leave_type_id = yl.leave_type_id
+                WHERE l.status= 'APPROVED' AND l.user_id = 4 AND YEAR(l.from_date) = 2022
+                GROUP BY l.leave_type_id"
+        */
+
         String SQL = "SELECT SUM(DATEDIFF(to_date,from_date)) AS total_leave , leave_type_id, user_id "
                 + "FROM leave_application "
                 + "WHERE YEAR(from_date) = :searchYear AND status = :status AND user_id = :userId GROUP BY leave_type_id";
