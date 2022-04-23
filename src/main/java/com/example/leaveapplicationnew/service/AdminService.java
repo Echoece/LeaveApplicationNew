@@ -56,7 +56,7 @@ public class AdminService {
         return yearlyLeaveRepository.save(yearlyLeave);
     }
 
-    public ApplicationUser addUser(ApplicationUserDTO userDTO){
+    public ApplicationUserDTO addUser(ApplicationUserDTO userDTO){
         // get the user role
         ApplicationUserRole role = roleRepository.findFirstByName(userDTO.getRole());
 
@@ -75,7 +75,8 @@ public class AdminService {
                 .build();
 
         // save and  return the user
-        return userRepository.save(user);
+        userRepository.save(user);
+        return userDTO;
     }
 
     public List<LeaveApplicationDTO> viewAllLeave(){
@@ -85,7 +86,8 @@ public class AdminService {
                 + " FROM leave_application_new.leave_application l "
                 + " JOIN leave_application_new.user u ON l.user_id = u.id "
                 + " JOIN leave_application_new.leave_type lt ON l.leave_type_id = lt.id "
-                + " WHERE status = 'APPROVED'";
+                + " WHERE l.status = 'APPROVED' "
+                + " ORDER BY l.to_date DESC";
 
         return jdbcTemplate.query(SQL, leaveApplicationRowMapper);
     }

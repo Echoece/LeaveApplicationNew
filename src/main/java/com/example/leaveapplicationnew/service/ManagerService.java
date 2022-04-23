@@ -72,7 +72,6 @@ public class ManagerService {
     public List<TotalLeaveDTO> showLeaveBalance( ){
         long managerId = getApplicationUser().getUserId();
         int searchYear = Year.now().getValue();
-
         String status = Status.APPROVED.name();
 
         // SQL query to find status, leave Type id + name , user id + name,

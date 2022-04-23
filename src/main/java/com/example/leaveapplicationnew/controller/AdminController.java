@@ -1,6 +1,5 @@
 package com.example.leaveapplicationnew.controller;
 
-import com.example.leaveapplicationnew.entity.ApplicationUser;
 import com.example.leaveapplicationnew.entity.LeaveType;
 import com.example.leaveapplicationnew.entity.YearlyLeave;
 import com.example.leaveapplicationnew.entity.dto.ApplicationUserDTO;
@@ -30,7 +29,7 @@ public class AdminController {
     // done
     @PostMapping("/addUser")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ApplicationUser addUser(@RequestBody ApplicationUserDTO userDTO){
+    public ApplicationUserDTO addUser(@RequestBody ApplicationUserDTO userDTO){
         return adminService.addUser(userDTO);
     }
 
