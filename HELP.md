@@ -23,5 +23,4 @@ Admin feature:
   3. Add user
   4. View all leave
 
-Entity-Relationship Diagram:
-![E-R Diagram](E-R Diagram.jpg?raw=true "Project E-R Diagram")
+
