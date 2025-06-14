@@ -1,9 +1,11 @@
 package com.example.leaveapplicationnew.controller;
 
+import com.example.leaveapplicationnew.entity.LeaveApplication;
 import com.example.leaveapplicationnew.entity.dto.LeaveApplicationDTO;
 import com.example.leaveapplicationnew.entity.dto.TotalLeaveDTO;
 import com.example.leaveapplicationnew.service.EmployeeService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,5 +53,15 @@ public class EmployeeController {
         return employeeService.showLeaveBalanceForEmployee();
     }
 
+    @GetMapping("/leaveApplication/{id}")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    public ResponseEntity<?> showLeaveApplicationById(@PathVariable("id") long id){
+        return ResponseEntity.ok(employeeService.findApplicationById(id));
+    }
 
+    @PutMapping("/updateApplication/{id}")
+    @PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+    public ResponseEntity<?> updateApplication(@PathVariable("id") long id, @RequestBody LeaveApplication leaveApplication){
+        return ResponseEntity.ok(employeeService.updateApplication(id, leaveApplication));
+    }
 }

@@ -77,10 +77,13 @@ public class ManagerService {
         // SQL query to find status, leave Type id + name , user id + name,
         // maximum allowed leave for the year, total leave taken by employee that year.
 
-        String SQL = "SELECT SUM(DATEDIFF(to_date,from_date)) AS total_leave , leave_type_id, user_id "
-                + " FROM leave_application "
-                + " WHERE YEAR(from_date) = :searchYear AND status = :status AND user_id IN(SELECT id FROM user WHERE manager_id=:managerId)  "
-                + " GROUP BY leave_type_id, user_id";
+        String SQL = "SELECT SUM(DATEDIFF(l.to_date, l.from_date)) AS total_leave , l.leave_type_id, lt.name , l.user_id, u.email AS email "
+                + " FROM leave_application l"
+                + " LEFT JOIN user u ON u.id = l.user_id "
+                + " LEFT JOIN leave_type lt ON lt.id = l.leave_type_id"
+                + " LEFT JOIN yearly_leave yl ON yl.leave_type_id = lt.id"
+                + " WHERE YEAR(l.from_date) = :searchYear AND l.status = :status AND l.user_id IN(SELECT id FROM user WHERE manager_id=:managerId)  "
+                + " GROUP BY l.leave_type_id, l.user_id";
 
         SqlParameterSource sqlParameterSource = new MapSqlParameterSource()
                 .addValue("searchYear", searchYear)
@@ -94,12 +97,12 @@ public class ManagerService {
                                 .leaveTypeId(rs.getLong("leave_type_id"))
                                 .userId(rs.getLong("user_id"))
                                 .totalLeave(rs.getInt("total_leave"))
+                                .userName(rs.getString("email"))
+                                .leaveTypeName(rs.getString("lt.name"))
                                 .build()
         );
 
         totalLeaveDTO.forEach(element -> {
-            element.setLeaveTypeName(leaveTypeRepository.findById(element.getLeaveTypeId()).get().getName());
-            element.setUserName(userRepository.findById(element.getUserId()).get().getName());
             element.setMaxAllowedLeave(yearlyLeaveRepository.findMaximumDayByYearAndLeaveTypeId(Year.now().getValue(), element.getLeaveTypeId()));
         });
 
@@ -121,7 +124,7 @@ public class ManagerService {
                 .orElseThrow(RuntimeException::new);
 
         ApplicationUser user = userRepository
-                .getApplicationUserByName(username)
+                .findApplicationUsersByEmail(username)
                 .orElseThrow(RuntimeException::new);
         return user;
     }

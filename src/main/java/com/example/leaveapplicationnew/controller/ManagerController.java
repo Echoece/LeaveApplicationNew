@@ -27,14 +27,14 @@ public class ManagerController {
 
     // tested + done
     @PostMapping("/approve/{id}")
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     public LeaveApplication approveApplication(@PathVariable("id") long id){
         return managerService.approveOrRejectApplication(id, Status.APPROVED);
     }
 
     // tested + done
     @PostMapping("/reject/{id}")
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     public LeaveApplication rejectApplication(@PathVariable("id") long id){
         return managerService.approveOrRejectApplication(id, Status.REJECTED);
     }

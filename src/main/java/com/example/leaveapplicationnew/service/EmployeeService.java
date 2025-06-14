@@ -13,11 +13,13 @@ import com.example.leaveapplicationnew.repo.ApplicationUserRepository;
 import com.example.leaveapplicationnew.repo.LeaveApplicationRepository;
 import com.example.leaveapplicationnew.repo.LeaveTypeRepository;
 import com.example.leaveapplicationnew.repo.YearlyLeaveRepository;
+import com.example.leaveapplicationnew.utility.Helper;
 import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.sql.Date;
 import java.time.Year;
@@ -54,6 +56,7 @@ public class EmployeeService {
                 .toDate(applicationDTO.getToDate())
                 .remark(applicationDTO.getRemark())
                 .leaveType(leaveType)
+                .status(Status.PENDING)
                 .user(user)
                 .build();
 
@@ -124,9 +127,9 @@ public class EmployeeService {
 
         String SQL = "SELECT l.id AS application_id, l.from_date, l.to_date, l.remark, l.status, l.manager_remark, l.leave_type_id, "
                 + " lt.name AS leave_type_name, u.id AS user_id, u.name AS user_name "
-                + " FROM leave_application_new.leave_application l "
-                + " JOIN leave_application_new.user u ON l.user_id = u.id "
-                + " JOIN leave_application_new.leave_type lt ON l.leave_type_id = lt.id "
+                + " FROM leave_application l "
+                + " JOIN user u ON l.user_id = u.id "
+                + " JOIN leave_type lt ON l.leave_type_id = lt.id "
                 + " WHERE l.user_id =:userId";
 
         SqlParameterSource sqlParameterSource = new MapSqlParameterSource().addValue("userId",userId);
@@ -240,8 +243,19 @@ public class EmployeeService {
                 .orElseThrow(RuntimeException::new);
 
         ApplicationUser user = userRepository
-                .getApplicationUserByName(username)
+                .findApplicationUsersByEmail(username)
                 .orElseThrow(RuntimeException::new);
         return user;
+    }
+
+    public LeaveApplication findApplicationById(long id) {
+        return leaveApplicationRepository.findById(id).orElseThrow(RuntimeException::new);
+    }
+
+    public LeaveApplication updateApplication(long id, LeaveApplication leaveApplication) {
+        LeaveApplication savedApplication = findApplicationById(id);
+        Helper.copyNonNullProperties(leaveApplication, savedApplication);
+
+        return leaveApplicationRepository.save(savedApplication);
     }
 }

@@ -24,10 +24,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+
 public class JwtTokenVerifier extends OncePerRequestFilter {
     private final JwtConfig jwtConfig;
     private final SecretKey secretKey;
+
+    public JwtTokenVerifier(JwtConfig jwtConfig, SecretKey secretKey) {
+        this.jwtConfig = jwtConfig;
+        this.secretKey = secretKey;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -57,11 +62,11 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
             // extracting username and authorities
             String username = body.getSubject();
 
-            List<Map<String, String>> authorities = (List<Map<String, String>>) body.get(JwtConfig.AUTHORITIES);
+            List<String> authorities = (List<String>) body.get(JwtConfig.AUTHORITIES);
 
             // As our UsernamePasswordAuthenticationToken expects a collection<? extends GrantedAuthority>, we map the authorities as Set
-            Set<SimpleGrantedAuthority> simpleGrantedAuthorities = authorities.stream()
-                    .map(element -> new SimpleGrantedAuthority( element.get("authority")))
+            Set<SimpleGrantedAuthority> simpleGrantedAuthorities = (authorities == null) ? null : authorities.stream()
+                    .map(element -> new SimpleGrantedAuthority("ROLE_" + element.trim()))
                     .collect(Collectors.toSet());
 
             // creating the authentication object

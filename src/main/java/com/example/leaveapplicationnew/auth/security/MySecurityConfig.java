@@ -6,6 +6,8 @@ import com.example.leaveapplicationnew.auth.jwt.JwtAuthenticationFilter;
 import com.example.leaveapplicationnew.auth.jwt.JwtConfig;
 import com.example.leaveapplicationnew.auth.jwt.JwtTokenVerifier;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -14,8 +16,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.SecretKey;
+import java.util.List;
+
+import static org.springframework.http.HttpMethod.*;
+import static org.springframework.http.HttpMethod.OPTIONS;
 
 @AllArgsConstructor
 @EnableWebSecurity
@@ -40,6 +49,7 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .cors(cors-> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement()                           // making session stateless, No session will be created or used by spring security
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -62,5 +72,25 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
         //auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
 
         auth.authenticationProvider(provider);
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        List<String> allowedOrigins = List.of("http://localhost:4200", "production api here");
+        List<String> allowedHttpHeaders = List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE);
+        List<String> allowedHttpMethods = List.of(
+                GET.name(), POST.name(), PUT.name(), PATCH.name(), DELETE.name(), OPTIONS.name()
+        );
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedMethods(allowedHttpMethods);
+        configuration.setAllowedHeaders(allowedHttpHeaders);
+//        corsConfig.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**",configuration);
+
+        return source;
     }
 }
